@@ -25,9 +25,13 @@ public class GridWorldTest {
     rewardValue = 100L;
     actorImage = ImageIO.read(new File(GridWorldTest.class.getClassLoader().getResource("cobain.jpg").getFile()));
     goalImage = ImageIO.read(new File(GridWorldTest.class.getClassLoader().getResource("guitar.png").getFile()));
-    actor = new Component(0,0,actorImage,"actor");
-    goal = new Component(3,3,goalImage,"goal");
-    gridWorld = new GridWorld(actor,goal,5, rewardValue);
+    actor = new Component(0, 0, actorImage, "actor");
+    goal = new Component(3, 3, goalImage, "goal");
+  }
+
+  @Test
+  public void test_generate_grid_world(){
+    gridWorld = new GridWorld(actor, goal, 5, rewardValue);
   }
 
 }

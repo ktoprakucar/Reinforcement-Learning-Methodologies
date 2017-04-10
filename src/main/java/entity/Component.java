@@ -34,4 +34,8 @@ public class Component {
   public void setyAxis(int yAxis) {
     this.yAxis = yAxis;
   }
+
+  public BufferedImage getImage() {
+    return image;
+  }
 }
