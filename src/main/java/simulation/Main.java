@@ -19,12 +19,17 @@ public class Main {
   static BufferedImage goalImage;
   static Long rewardValue;
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException, InterruptedException {
     rewardValue = 100L;
     actorImage = ImageIO.read(new File(Main.class.getClassLoader().getResource("cobain.jpg").getFile()));
     goalImage = ImageIO.read(new File(Main.class.getClassLoader().getResource("guitar.png").getFile()));
     actor = new Component(0, 0, actorImage, "actor");
-    goal = new Component(9, 3, goalImage, "goal");
+    goal = new Component(5, 5, goalImage, "goal");
     gridWorld = new GridWorld(actor, goal, 10, rewardValue);
+    for (int i = 0; i < 5; i++) {
+      Thread.sleep(400);
+      gridWorld.reloadWorlAfterMovement("down");
+      System.out.println(i);
+    }
   }
 }

@@ -38,4 +38,15 @@ public class Component {
   public BufferedImage getImage() {
     return image;
   }
+
+  public void moveComponent(String direction){
+    if ("up".equalsIgnoreCase(direction))
+      yAxis--;
+    else if ("down".equalsIgnoreCase(direction))
+      yAxis++;
+    else if ("rigth".equalsIgnoreCase(direction))
+      xAxis++;
+    else if ("left".equalsIgnoreCase(direction))
+      xAxis--;
+  }
 }

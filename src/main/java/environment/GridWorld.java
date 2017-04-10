@@ -15,6 +15,8 @@ public class GridWorld {
   private Component goal;
   private int size;
   private BigDecimal qTable[][];
+  JFrame frame;
+  JPanel panel;
 
   public GridWorld(Component actor, Component goal, int size, long rewardValue) {
     this.actor = actor;
@@ -26,8 +28,8 @@ public class GridWorld {
   }
 
   public void display() {
-    JFrame frame = new JFrame();
-    JPanel panel = new JPanel(null);
+    frame = new JFrame();
+    panel = new JPanel(null);
     frame.getContentPane().setLayout(null);
     frame.setVisible(true);
     frame.setSize(55 * size, 55 * size);
@@ -42,6 +44,12 @@ public class GridWorld {
     frame.add(panel);
     System.out.println(panel.getComponentCount());
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+  }
+
+  public void reloadWorlAfterMovement(String direction) {
+    actor.moveComponent(direction);
+    panel.getComponent(0).setBounds((actor.getxAxis()), (actor.getyAxis()) * 50, 50, 50);
+    panel.updateUI();
   }
 
 
