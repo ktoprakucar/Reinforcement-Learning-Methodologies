@@ -8,6 +8,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * Created by toprak on 07-Apr-17.
@@ -32,6 +35,16 @@ public class GridWorldTest {
   @Test
   public void test_generate_grid_world(){
     gridWorld = new GridWorld(actor, goal, 5, rewardValue);
+  }
+
+  @Test
+  public void test_initialize_rewards_for_each_state(){
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    gridWorld.initializeRewards(rewardValue);
+    assertEquals(gridWorld.getQValue(0,0), BigDecimal.valueOf(100));
+    assertEquals(gridWorld.getQValue(0,1),BigDecimal.valueOf(-20));
+    assertEquals(gridWorld.getQValue(1,1),BigDecimal.valueOf(-5));
+    assertEquals(gridWorld.getQValue(5,5), BigDecimal.valueOf(-20));
   }
 
 }
