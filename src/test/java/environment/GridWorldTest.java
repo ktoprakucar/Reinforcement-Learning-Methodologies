@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -55,6 +57,70 @@ public class GridWorldTest {
     assertEquals(gridWorld.getqTable()[0][0].getRewards().size(), 3);
     assertEquals(gridWorld.getqTable()[0][1].getRewards().size(), 2);
     assertEquals(gridWorld.getqTable()[0][2].getRewards().size(), 1);
+  }
+
+  @Test
+  public void test_select_right(){
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    BigDecimal up = BigDecimal.valueOf(10);
+    BigDecimal down = BigDecimal.valueOf(20);
+    BigDecimal left = BigDecimal.valueOf(30);
+    BigDecimal right = BigDecimal.valueOf(40);
+    Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
+    actionMap.put("up", up);
+    actionMap.put("down", down);
+    actionMap.put("right", right);
+    actionMap.put("left", left);
+    String action = gridWorld.greedySelection(actionMap);
+    assertEquals(action, "right");
+  }
+
+  @Test
+  public void test_select_left(){
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    BigDecimal up = BigDecimal.valueOf(10);
+    BigDecimal down = BigDecimal.valueOf(20);
+    BigDecimal left = BigDecimal.valueOf(60);
+    BigDecimal right = BigDecimal.valueOf(40);
+    Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
+    actionMap.put("up", up);
+    actionMap.put("down", down);
+    actionMap.put("right", right);
+    actionMap.put("left", left);
+    String action = gridWorld.greedySelection(actionMap);
+    assertEquals(action, "left");
+  }
+
+  @Test
+  public void test_select_down(){
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    BigDecimal up = BigDecimal.valueOf(10);
+    BigDecimal down = BigDecimal.valueOf(80);
+    BigDecimal left = BigDecimal.valueOf(60);
+    BigDecimal right = BigDecimal.valueOf(40);
+    Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
+    actionMap.put("up", up);
+    actionMap.put("down", down);
+    actionMap.put("right", right);
+    actionMap.put("left", left);
+    String action = gridWorld.greedySelection(actionMap);
+    assertEquals(action, "down");
+  }
+
+  @Test
+  public void test_select_up(){
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    BigDecimal up = BigDecimal.valueOf(100);
+    BigDecimal down = BigDecimal.valueOf(80);
+    BigDecimal left = BigDecimal.valueOf(60);
+    BigDecimal right = BigDecimal.valueOf(40);
+    Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
+    actionMap.put("up", up);
+    actionMap.put("down", down);
+    actionMap.put("right", right);
+    actionMap.put("left", left);
+    String action = gridWorld.greedySelection(actionMap);
+    assertEquals(action, "up");
   }
 
 }

@@ -4,9 +4,8 @@ import entity.Component;
 import entity.State;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * Created by toprak on 07-Apr-17.
@@ -17,8 +16,11 @@ public class GridWorld {
     private int size;
     private State qTable[][];
     public static final double gamma = 0.7;
+    public static final double epsilon = 0.3;
     JFrame frame;
     JPanel panel;
+
+    Random generator = new Random();
 
     public GridWorld(Component actor, Component goal, int size, long rewardValue) {
         this.actor = actor;
@@ -59,39 +61,62 @@ public class GridWorld {
     private void appendRewardToStates(BigDecimal value) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if(qTable[i][j].isAccessed()){
+                if (qTable[i][j].isAccessed()) {
                     qTable[i][j].addReward(value);
                 }
             }
         }
     }
 
+    public void epsilonGreedyExploration() {
+        BigDecimal right = null, left = null, up = null, down = null;
+        Map<String, BigDecimal> actionMap = setActionValues(right, left, up, down);
+        String greatestAction = greedySelection(actionMap);
+
+    }
+
+    public String greedySelection(Map<String, BigDecimal> actionMap) {
+        List<String> maxValues = new ArrayList<String>();
+        boolean isFirst = true;
+        for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
+            if (isFirst) {
+                maxValues.add(entry.getKey());
+                isFirst = false;
+                continue;
+            } else if (actionMap.get(maxValues.get(0)).equals(entry.getValue()))
+                maxValues.add(entry.getKey());
+            else if(actionMap.get(maxValues.get(0)).compareTo(entry.getValue()) == -1){
+                maxValues.clear();
+                maxValues.add(entry.getKey());
+            }
+        }
+        if(maxValues.size() == 1)
+            return maxValues.get(0);
+        else{
+            int randomGreatesIndex = generator.nextInt((maxValues.size() - 1) - 0 + 1) + 0;
+            return maxValues.get(randomGreatesIndex);
+        }
+    }
+
+    public Map<String, BigDecimal> setActionValues(BigDecimal right, BigDecimal left, BigDecimal up, BigDecimal down) {
+        Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
+        if (actor.getxAxis() - 1 >= 0)
+            up = qTable[actor.getxAxis() - 1][actor.getyAxis()].getValue();
+        if (actor.getxAxis() + 1 < size)
+            down = qTable[actor.getxAxis() + 1][actor.getyAxis()].getValue();
+        if (actor.getyAxis() - 1 >= 0)
+            left = qTable[actor.getxAxis()][actor.getyAxis() - 1].getValue();
+        if (actor.getyAxis() + 1 < size)
+            right = qTable[actor.getxAxis()][actor.getyAxis() + 1].getValue();
+        actionMap.put("up", up);
+        actionMap.put("down", down);
+        actionMap.put("rigth", right);
+        actionMap.put("left", left);
+        return actionMap;
+    }
+
     public State[][] getqTable() {
         return qTable;
-    }
-
-    public Component getActor() {
-        return actor;
-    }
-
-    public void setActor(Component actor) {
-        this.actor = actor;
-    }
-
-    public Component getGoal() {
-        return goal;
-    }
-
-    public void setGoal(Component goal) {
-        this.goal = goal;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
     }
 
     public BigDecimal getQValue(int xLocation, int yLocation) {

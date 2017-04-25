@@ -19,18 +19,6 @@ public class State {
         return rewards;
     }
 
-    public void setRewards(List<BigDecimal> rewards) {
-        this.rewards = rewards;
-    }
-
-    public int getCounter() {
-        return counter;
-    }
-
-    public void setCounter(int counter) {
-        this.counter = counter;
-    }
-
     public boolean isAccessed() {
         return isAccessed;
     }
