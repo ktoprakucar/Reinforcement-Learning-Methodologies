@@ -16,6 +16,7 @@ public class GridWorld {
     private Component goal;
     private int size;
     private State qTable[][];
+    public static final double gamma = 0.7;
     JFrame frame;
     JPanel panel;
 
@@ -45,12 +46,29 @@ public class GridWorld {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    public void reloadWorlAfterMovement(String direction) {
+    public void reloadWorldAfterMovement(String direction) {
+        int previousX = actor.getxAxis();
+        int previousY = actor.getyAxis();
         actor.moveComponent(direction);
+        qTable[previousX][previousY].setAccessed();
+        appendRewardToStates(qTable[actor.getxAxis()][actor.getyAxis()].getValue());
         panel.getComponent(0).setBounds((actor.getxAxis()), (actor.getyAxis()) * 50, 50, 50);
         panel.updateUI();
     }
 
+    private void appendRewardToStates(BigDecimal value) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if(qTable[i][j].isAccessed()){
+                    qTable[i][j].addReward(value);
+                }
+            }
+        }
+    }
+
+    public State[][] getqTable() {
+        return qTable;
+    }
 
     public Component getActor() {
         return actor;

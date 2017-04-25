@@ -1,5 +1,7 @@
 package entity;
 
+import environment.GridWorld;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +35,8 @@ public class State {
         return isAccessed;
     }
 
-    public void setAccessed(boolean accessed) {
-        isAccessed = accessed;
+    public void setAccessed() {
+        this.isAccessed = true;
     }
 
     public BigDecimal getValue() {
@@ -43,5 +45,10 @@ public class State {
 
     public void setValue(BigDecimal value) {
         this.value = value;
+    }
+
+    public void addReward(BigDecimal value) {
+        this.counter++;
+        rewards.add(BigDecimal.valueOf(Math.pow(GridWorld.gamma, counter)).multiply(value));
     }
 }

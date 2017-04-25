@@ -27,8 +27,8 @@ public class Main {
     goal = new Component(5, 5, goalImage, "goal");
     gridWorld = new GridWorld(actor, goal, 10, rewardValue);
     for (int i = 0; i < 5; i++) {
-      Thread.sleep(400);
-      gridWorld.reloadWorlAfterMovement("down");
+      Thread.sleep(100);
+      gridWorld.reloadWorldAfterMovement("down");
       System.out.println(i);
     }
   }
