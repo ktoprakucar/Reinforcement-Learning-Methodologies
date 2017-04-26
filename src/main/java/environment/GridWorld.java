@@ -15,6 +15,7 @@ public class GridWorld {
     private Component goal;
     private int size;
     private State qTable[][];
+    private boolean hasWind = false;
     public static final double gamma = 0.7;
     private double epsilon;
     JFrame frame;
@@ -53,10 +54,20 @@ public class GridWorld {
         int previousX = actor.getxAxis();
         int previousY = actor.getyAxis();
         actor.moveComponent(direction);
+        if (hasWind) {
+            flyActor();
+        }
         qTable[previousX][previousY].setAccessed();
         appendRewardToStates(qTable[actor.getxAxis()][actor.getyAxis()].getValue());
         panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
         panel.updateUI();
+    }
+
+    private void flyActor() {
+        int xValue = generator.nextInt(((size - 1) - 0) + 1) + 0;
+        int yValue = generator.nextInt(((size - 1) - 0) + 1) + 0;
+        actor.setxAxis(xValue);
+        actor.setyAxis(yValue);
     }
 
     private void appendRewardToStates(BigDecimal value) {
@@ -78,7 +89,7 @@ public class GridWorld {
         else {
             List<String> actions = new ArrayList<String>();
             for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
-                if (entry.getValue().compareTo(actionMap.get(greatestAction)) <0 || areAllEqual(actionMap)) {
+                if (entry.getValue().compareTo(actionMap.get(greatestAction)) < 0 || areAllEqual(actionMap)) {
                     actions.add(entry.getKey());
                 }
             }
@@ -158,6 +169,10 @@ public class GridWorld {
     public void decreaseEpsilon(double value) {
         if (epsilon > 0)
             this.epsilon -= value;
+    }
+
+    public void generateWind() {
+        this.hasWind = true;
     }
 
     public void initializeRewards(long rewardValue) {

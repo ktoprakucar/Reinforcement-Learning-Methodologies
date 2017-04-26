@@ -14,6 +14,7 @@ import java.io.IOException;
 public class Main {
     public static final int SIZE = 4;
     public static final double epsilon = 0.3;
+    public static final boolean hasWind = false;
     static GridWorld gridWorld;
     static Component actor;
     static Component goal;
@@ -29,6 +30,8 @@ public class Main {
         actor = new Component(0, 0, actorImage, "actor");
         goal = new Component(3, 3, goalImage, "goal");
         gridWorld = new GridWorld(actor, goal, SIZE, rewardValue, epsilon);
+        if(hasWind)
+            gridWorld.generateWind();
         for (int i = 0; i < 1000; i++) {
            // printQTable();
             boolean isGoal = false;
@@ -38,7 +41,7 @@ public class Main {
                 String direction = gridWorld.epsilonGreedyExploration();
                 gridWorld.reloadWorldAfterMovement(direction);
                 stepNumber++;
-                Thread.sleep(1);
+                Thread.sleep(5);
                 if (actor.getxAxis() == goal.getxAxis() && actor.getyAxis() == goal.getyAxis()) {
                     System.out.println(stepNumber);
                     gridWorld.recalculateReturnValues();
