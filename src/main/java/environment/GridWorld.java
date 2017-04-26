@@ -16,16 +16,17 @@ public class GridWorld {
     private int size;
     private State qTable[][];
     public static final double gamma = 0.7;
-    private double epsilon = 0.5;
+    private double epsilon;
     JFrame frame;
     JPanel panel;
 
     Random generator = new Random();
 
-    public GridWorld(Component actor, Component goal, int size, long rewardValue) {
+    public GridWorld(Component actor, Component goal, int size, long rewardValue, double epsilon) {
         this.actor = actor;
         this.goal = goal;
         this.size = size;
+        this.epsilon = epsilon;
         initializeRewards(rewardValue);
         display();
     }
@@ -54,7 +55,7 @@ public class GridWorld {
         actor.moveComponent(direction);
         qTable[previousX][previousY].setAccessed();
         appendRewardToStates(qTable[actor.getxAxis()][actor.getyAxis()].getValue());
-        panel.getComponent(0).setBounds((actor.getxAxis())*29, (actor.getyAxis()) * 29, 50, 50);
+        panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
         panel.updateUI();
     }
 
@@ -78,7 +79,7 @@ public class GridWorld {
         else {
             List<String> actions = new ArrayList<String>();
             for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
-                if (entry.getValue().compareTo(actionMap.get(greatestAction)) == -1 || areAllEqual(actionMap)) {
+                if (entry.getValue().compareTo(actionMap.get(greatestAction)) <0 || areAllEqual(actionMap)) {
                     actions.add(entry.getKey());
                 }
             }
@@ -113,7 +114,7 @@ public class GridWorld {
                 continue;
             } else if (actionMap.get(maxValues.get(0)).equals(entry.getValue()))
                 maxValues.add(entry.getKey());
-            else if (actionMap.get(maxValues.get(0)).compareTo(entry.getValue()) == -1) {
+            else if (actionMap.get(maxValues.get(0)).compareTo(entry.getValue()) < 0) {
                 maxValues.clear();
                 maxValues.add(entry.getKey());
             }
@@ -160,7 +161,8 @@ public class GridWorld {
     }
 
     public void decreaseEpsilon(double value) {
-        this.epsilon -= value;
+        if (epsilon > 0)
+            this.epsilon -= value;
     }
 
     public void initializeRewards(long rewardValue) {
@@ -168,16 +170,15 @@ public class GridWorld {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 qTable[i][j] = new State();
-                if (i == actor.getxAxis() && j == actor.getyAxis())
+                if (i == goal.getxAxis() && j == goal.getyAxis())
                     qTable[i][j].setValue(BigDecimal.valueOf(rewardValue));
                 else if (i == 0 || j == 0 || i == size - 1 || j == size - 1)
-                    qTable[i][j].setValue(BigDecimal.valueOf(-20));
+                    qTable[i][j].setValue(BigDecimal.valueOf(-15));
                 else
                     qTable[i][j].setValue(BigDecimal.valueOf(-5));
 
             }
         }
-        qTable[goal.getxAxis()][goal.getyAxis()].setValue(BigDecimal.valueOf(rewardValue));
     }
 
     public void recalculateReturnValues() {

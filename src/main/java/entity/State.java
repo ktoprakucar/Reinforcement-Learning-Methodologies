@@ -42,8 +42,9 @@ public class State {
 
     public void calculateAverageReturn() {
         BigDecimal sum = BigDecimal.ZERO;
-        for(BigDecimal reward : rewards)
+        for (BigDecimal reward : rewards)
             sum = sum.add(reward);
-        value = sum.divide(BigDecimal.valueOf(counter));
+        if (this.counter != 0)
+            value = value.add(sum.divide(BigDecimal.valueOf(counter), 10, BigDecimal.ROUND_HALF_UP));
     }
 }

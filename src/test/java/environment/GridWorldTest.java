@@ -24,10 +24,12 @@ public class GridWorldTest {
   BufferedImage actorImage;
   BufferedImage goalImage;
   Long rewardValue;
+  double epsilon;
 
   @Before
   public void setUp() throws IOException {
     rewardValue = 100L;
+    epsilon = 0.3;
     actorImage = ImageIO.read(new File(GridWorldTest.class.getClassLoader().getResource("cobain.jpg").getFile()));
     goalImage = ImageIO.read(new File(GridWorldTest.class.getClassLoader().getResource("guitar.png").getFile()));
     actor = new Component(0, 0, actorImage, "actor");
@@ -36,21 +38,21 @@ public class GridWorldTest {
 
   @Test
   public void test_generate_grid_world(){
-    gridWorld = new GridWorld(actor, goal, 5, rewardValue);
+    gridWorld = new GridWorld(actor, goal, 5, rewardValue, epsilon);
   }
 
   @Test
   public void test_initialize_rewards_for_each_state(){
-    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
-    assertEquals(gridWorld.getQValue(0,0), BigDecimal.valueOf(100));
-    assertEquals(gridWorld.getQValue(0,1),BigDecimal.valueOf(-20));
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
+    assertEquals(gridWorld.getQValue(0,0), BigDecimal.valueOf(-15));
+    assertEquals(gridWorld.getQValue(0,1),BigDecimal.valueOf(-15));
     assertEquals(gridWorld.getQValue(1,1),BigDecimal.valueOf(-5));
-    assertEquals(gridWorld.getQValue(5,5), BigDecimal.valueOf(-20));
+    assertEquals(gridWorld.getQValue(5,5), BigDecimal.valueOf(-15));
   }
 
   @Test
   public void test_append_reward_values_to_state(){
-    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
     gridWorld.reloadWorldAfterMovement("down");
     gridWorld.reloadWorldAfterMovement("down");
     gridWorld.reloadWorldAfterMovement("rigth");
@@ -61,7 +63,7 @@ public class GridWorldTest {
 
   @Test
   public void test_select_right(){
-    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
     BigDecimal up = BigDecimal.valueOf(10);
     BigDecimal down = BigDecimal.valueOf(20);
     BigDecimal left = BigDecimal.valueOf(30);
@@ -77,7 +79,7 @@ public class GridWorldTest {
 
   @Test
   public void test_select_left(){
-    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
     BigDecimal up = BigDecimal.valueOf(10);
     BigDecimal down = BigDecimal.valueOf(20);
     BigDecimal left = BigDecimal.valueOf(60);
@@ -93,7 +95,7 @@ public class GridWorldTest {
 
   @Test
   public void test_select_down(){
-    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
     BigDecimal up = BigDecimal.valueOf(10);
     BigDecimal down = BigDecimal.valueOf(80);
     BigDecimal left = BigDecimal.valueOf(60);
@@ -109,7 +111,7 @@ public class GridWorldTest {
 
   @Test
   public void test_select_up(){
-    gridWorld = new GridWorld(actor, goal, 6, rewardValue);
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
     BigDecimal up = BigDecimal.valueOf(100);
     BigDecimal down = BigDecimal.valueOf(80);
     BigDecimal left = BigDecimal.valueOf(60);
