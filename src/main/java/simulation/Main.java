@@ -34,16 +34,16 @@ public class Main {
       while (!isGoal) {
         String direction = gridWorld.epsilonGreedyExploration();
         System.out.println(direction);
-        actor.moveComponent(direction);
+        gridWorld.reloadWorldAfterMovement(direction);
         gridWorld.decreaseEpsilon(0.01);
         stepNumber++;
-        Thread.sleep(800);
+        Thread.sleep(100);
         if(actor.getxAxis() == goal.getxAxis() && actor.getyAxis() == goal.getyAxis()){
           System.out.println(stepNumber);
           gridWorld.recalculateReturnValues();
           continue;
         }
-        gridWorld.reloadWorldAfterMovement(direction);
+
       }
     }
   }

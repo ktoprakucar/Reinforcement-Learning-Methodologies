@@ -16,7 +16,7 @@ public class GridWorld {
     private int size;
     private State qTable[][];
     public static final double gamma = 0.7;
-    private double epsilon = 0.3;
+    private double epsilon = 0.5;
     JFrame frame;
     JPanel panel;
 
@@ -38,9 +38,9 @@ public class GridWorld {
         frame.setSize(55 * size, 55 * size);
         panel.setSize(55 * size, 55 * size);
         JLabel actorLabel = new JLabel(new ImageIcon(actor.getImage()));
-        actorLabel.setBounds(actor.getxAxis() * 50, actor.getyAxis() * 50, 50, 50);
+        actorLabel.setBounds(actor.getxAxis() * 29, actor.getyAxis() * 29, 50, 50);
         JLabel goalLabel = new JLabel(new ImageIcon(goal.getImage()));
-        goalLabel.setBounds(goal.getxAxis() * 50, goal.getyAxis() * 50, 50, 50);
+        goalLabel.setBounds(goal.getxAxis() * 29, goal.getyAxis() * 29, 50, 50);
         panel.add(actorLabel);
         panel.add(goalLabel);
         panel.setVisible(true);
@@ -129,23 +129,23 @@ public class GridWorld {
     public Map<String, BigDecimal> setActionValues(BigDecimal right, BigDecimal left, BigDecimal up, BigDecimal down) {
         Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
         if (actor.getxAxis() - 1 >= 0) {
-            up = qTable[actor.getxAxis() - 1][actor.getyAxis()].getValue();
-            actionMap.put("up", up);
-
-        }
-        if (actor.getxAxis() + 1 < size) {
-            down = qTable[actor.getxAxis() + 1][actor.getyAxis()].getValue();
-            actionMap.put("down", down);
-
-        }
-        if (actor.getyAxis() - 1 >= 0) {
-            left = qTable[actor.getxAxis()][actor.getyAxis() - 1].getValue();
+            left = qTable[actor.getxAxis() - 1][actor.getyAxis()].getValue();
             actionMap.put("left", left);
 
         }
-        if (actor.getyAxis() + 1 < size) {
-            right = qTable[actor.getxAxis()][actor.getyAxis() + 1].getValue();
+        if (actor.getxAxis() + 1 < size) {
+            right = qTable[actor.getxAxis() + 1][actor.getyAxis()].getValue();
             actionMap.put("rigth", right);
+
+        }
+        if (actor.getyAxis() - 1 >= 0) {
+            up = qTable[actor.getxAxis()][actor.getyAxis() - 1].getValue();
+            actionMap.put("up", up);
+
+        }
+        if (actor.getyAxis() + 1 < size) {
+            down = qTable[actor.getxAxis()][actor.getyAxis() + 1].getValue();
+            actionMap.put("down", down);
 
         }
         return actionMap;

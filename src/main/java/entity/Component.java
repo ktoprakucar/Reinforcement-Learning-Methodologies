@@ -41,12 +41,12 @@ public class Component {
 
   public void moveComponent(String direction){
     if ("up".equalsIgnoreCase(direction))
-      yAxis--;
+      this.yAxis--;
     else if ("down".equalsIgnoreCase(direction))
-      yAxis++;
+      this.yAxis++;
     else if ("rigth".equalsIgnoreCase(direction))
-      xAxis++;
+      this.xAxis++;
     else if ("left".equalsIgnoreCase(direction))
-      xAxis--;
+      this.xAxis--;
   }
 }
