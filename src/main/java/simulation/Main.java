@@ -27,10 +27,10 @@ public class Main {
         actorImage = ImageIO.read(new File(Main.class.getClassLoader().getResource("cobain.jpg").getFile()));
         goalImage = ImageIO.read(new File(Main.class.getClassLoader().getResource("guitar.png").getFile()));
         actor = new Component(0, 0, actorImage, "actor");
-        goal = new Component(0, 3, goalImage, "goal");
+        goal = new Component(3, 3, goalImage, "goal");
         gridWorld = new GridWorld(actor, goal, SIZE, rewardValue, epsilon);
-        for (int i = 0; i < 100; i++) {
-            //printQTable();
+        for (int i = 0; i < 1000; i++) {
+           // printQTable();
             boolean isGoal = false;
             actor.setxAxis(0);
             actor.setyAxis(0);
@@ -43,7 +43,7 @@ public class Main {
                     System.out.println(stepNumber);
                     gridWorld.recalculateReturnValues();
                     isGoal = true;
-                    gridWorld.decreaseEpsilon(0.015);
+                    gridWorld.decreaseEpsilon(0.001);
                     continue;
                 }
             }

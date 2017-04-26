@@ -70,8 +70,7 @@ public class GridWorld {
     }
 
     public String epsilonGreedyExploration() {
-        BigDecimal right = null, left = null, up = null, down = null;
-        Map<String, BigDecimal> actionMap = setActionValues(right, left, up, down);
+        Map<String, BigDecimal> actionMap = setActionValues();
         String greatestAction = greedySelection(actionMap);
         double number = generator.nextDouble();
         if (number < 1 - epsilon)
@@ -127,26 +126,22 @@ public class GridWorld {
         }
     }
 
-    public Map<String, BigDecimal> setActionValues(BigDecimal right, BigDecimal left, BigDecimal up, BigDecimal down) {
+    public Map<String, BigDecimal> setActionValues() {
         Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
         if (actor.getxAxis() - 1 >= 0) {
-            left = qTable[actor.getxAxis() - 1][actor.getyAxis()].getValue();
-            actionMap.put("left", left);
+            actionMap.put("left", qTable[actor.getxAxis() - 1][actor.getyAxis()].getValue());
 
         }
         if (actor.getxAxis() + 1 < size) {
-            right = qTable[actor.getxAxis() + 1][actor.getyAxis()].getValue();
-            actionMap.put("rigth", right);
+            actionMap.put("rigth", qTable[actor.getxAxis() + 1][actor.getyAxis()].getValue());
 
         }
         if (actor.getyAxis() - 1 >= 0) {
-            up = qTable[actor.getxAxis()][actor.getyAxis() - 1].getValue();
-            actionMap.put("up", up);
+            actionMap.put("up", qTable[actor.getxAxis()][actor.getyAxis() - 1].getValue());
 
         }
         if (actor.getyAxis() + 1 < size) {
-            down = qTable[actor.getxAxis()][actor.getyAxis() + 1].getValue();
-            actionMap.put("down", down);
+            actionMap.put("down", qTable[actor.getxAxis()][actor.getyAxis() + 1].getValue());
 
         }
         return actionMap;
