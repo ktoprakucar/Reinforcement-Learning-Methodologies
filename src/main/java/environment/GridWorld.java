@@ -16,7 +16,7 @@ public class GridWorld {
     private int size;
     private State qTable[][];
     public static final double gamma = 0.7;
-    public static final double epsilon = 0.3;
+    private double epsilon = 0.3;
     JFrame frame;
     JPanel panel;
 
@@ -54,7 +54,7 @@ public class GridWorld {
         actor.moveComponent(direction);
         qTable[previousX][previousY].setAccessed();
         appendRewardToStates(qTable[actor.getxAxis()][actor.getyAxis()].getValue());
-        panel.getComponent(0).setBounds((actor.getxAxis()), (actor.getyAxis()) * 50, 50, 50);
+        panel.getComponent(0).setBounds((actor.getxAxis())*29, (actor.getyAxis()) * 29, 50, 50);
         panel.updateUI();
     }
 
@@ -71,19 +71,18 @@ public class GridWorld {
     public String epsilonGreedyExploration() {
         BigDecimal right = null, left = null, up = null, down = null;
         Map<String, BigDecimal> actionMap = setActionValues(right, left, up, down);
-
         String greatestAction = greedySelection(actionMap);
         double number = generator.nextDouble();
-        if(number < 1-epsilon)
+        if (number < 1 - epsilon)
             return greatestAction;
-        else{
+        else {
             List<String> actions = new ArrayList<String>();
-            for(Map.Entry<String, BigDecimal> entry : actionMap.entrySet()){
-                if(entry.getValue().compareTo(actionMap.get(greatestAction)) == 1 || areAllEqual(actionMap)){
+            for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
+                if (entry.getValue().compareTo(actionMap.get(greatestAction)) == -1 || areAllEqual(actionMap)) {
                     actions.add(entry.getKey());
                 }
             }
-            int randomAction = generator.nextInt((actions.size() - 1) - 0 +1) + 0;
+            int randomAction = generator.nextInt((actions.size() - 1) - 0 + 1) + 0;
             return actions.get(randomAction);
         }
     }
@@ -91,13 +90,13 @@ public class GridWorld {
     private boolean areAllEqual(Map<String, BigDecimal> actionMap) {
         BigDecimal actionValue = BigDecimal.ZERO;
         for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
-            if(entry.getValue() != null){
+            if (entry.getValue() != null) {
                 actionValue = entry.getValue();
                 break;
             }
         }
         for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
-            if(entry.getValue() != null && actionValue.compareTo(entry.getValue()) != 0){
+            if (entry.getValue() != null && actionValue.compareTo(entry.getValue()) != 0) {
                 return false;
             }
         }
@@ -114,14 +113,14 @@ public class GridWorld {
                 continue;
             } else if (actionMap.get(maxValues.get(0)).equals(entry.getValue()))
                 maxValues.add(entry.getKey());
-            else if(actionMap.get(maxValues.get(0)).compareTo(entry.getValue()) == -1){
+            else if (actionMap.get(maxValues.get(0)).compareTo(entry.getValue()) == -1) {
                 maxValues.clear();
                 maxValues.add(entry.getKey());
             }
         }
-        if(maxValues.size() == 1)
+        if (maxValues.size() == 1)
             return maxValues.get(0);
-        else{
+        else {
             int randomGreatesIndex = generator.nextInt((maxValues.size() - 1) - 0 + 1) + 0;
             return maxValues.get(randomGreatesIndex);
         }
@@ -129,18 +128,26 @@ public class GridWorld {
 
     public Map<String, BigDecimal> setActionValues(BigDecimal right, BigDecimal left, BigDecimal up, BigDecimal down) {
         Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
-        if (actor.getxAxis() - 1 >= 0)
+        if (actor.getxAxis() - 1 >= 0) {
             up = qTable[actor.getxAxis() - 1][actor.getyAxis()].getValue();
-        if (actor.getxAxis() + 1 < size)
+            actionMap.put("up", up);
+
+        }
+        if (actor.getxAxis() + 1 < size) {
             down = qTable[actor.getxAxis() + 1][actor.getyAxis()].getValue();
-        if (actor.getyAxis() - 1 >= 0)
+            actionMap.put("down", down);
+
+        }
+        if (actor.getyAxis() - 1 >= 0) {
             left = qTable[actor.getxAxis()][actor.getyAxis() - 1].getValue();
-        if (actor.getyAxis() + 1 < size)
+            actionMap.put("left", left);
+
+        }
+        if (actor.getyAxis() + 1 < size) {
             right = qTable[actor.getxAxis()][actor.getyAxis() + 1].getValue();
-        actionMap.put("up", up);
-        actionMap.put("down", down);
-        actionMap.put("rigth", right);
-        actionMap.put("left", left);
+            actionMap.put("rigth", right);
+
+        }
         return actionMap;
     }
 
@@ -150,6 +157,10 @@ public class GridWorld {
 
     public BigDecimal getQValue(int xLocation, int yLocation) {
         return qTable[xLocation][yLocation].getValue();
+    }
+
+    public void decreaseEpsilon(double value) {
+        this.epsilon -= value;
     }
 
     public void initializeRewards(long rewardValue) {
@@ -167,5 +178,13 @@ public class GridWorld {
             }
         }
         qTable[goal.getxAxis()][goal.getyAxis()].setValue(BigDecimal.valueOf(rewardValue));
+    }
+
+    public void recalculateReturnValues() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                qTable[i][j].calculateAverageReturn();
+            }
+        }
     }
 }

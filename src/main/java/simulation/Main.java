@@ -18,6 +18,7 @@ public class Main {
   static BufferedImage actorImage;
   static BufferedImage goalImage;
   static Long rewardValue;
+  static int stepNumber;
 
   public static void main(String[] args) throws IOException, InterruptedException {
     rewardValue = 100L;
@@ -26,10 +27,24 @@ public class Main {
     actor = new Component(0, 0, actorImage, "actor");
     goal = new Component(5, 5, goalImage, "goal");
     gridWorld = new GridWorld(actor, goal, 10, rewardValue);
-    for (int i = 0; i < 5; i++) {
-      Thread.sleep(100);
-      gridWorld.reloadWorldAfterMovement("down");
-      System.out.println(i);
+    for(int i = 0; i < 50; i++) {
+      boolean isGoal = false;
+      actor.setxAxis(0);
+      actor.setyAxis(0);
+      while (!isGoal) {
+        String direction = gridWorld.epsilonGreedyExploration();
+        System.out.println(direction);
+        actor.moveComponent(direction);
+        gridWorld.decreaseEpsilon(0.01);
+        stepNumber++;
+        Thread.sleep(800);
+        if(actor.getxAxis() == goal.getxAxis() && actor.getyAxis() == goal.getyAxis()){
+          System.out.println(stepNumber);
+          gridWorld.recalculateReturnValues();
+          continue;
+        }
+        gridWorld.reloadWorldAfterMovement(direction);
+      }
     }
   }
 }
