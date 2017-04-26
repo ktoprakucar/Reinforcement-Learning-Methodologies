@@ -39,4 +39,11 @@ public class State {
         this.counter++;
         rewards.add(BigDecimal.valueOf(Math.pow(GridWorld.gamma, counter)).multiply(value));
     }
+
+    public void calculateAverageReturn() {
+        BigDecimal sum = BigDecimal.ZERO;
+        for(BigDecimal reward : rewards)
+            sum = sum.add(reward);
+        value = sum.divide(BigDecimal.valueOf(counter));
+    }
 }

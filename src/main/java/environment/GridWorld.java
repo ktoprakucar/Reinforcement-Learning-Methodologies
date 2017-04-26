@@ -68,11 +68,40 @@ public class GridWorld {
         }
     }
 
-    public void epsilonGreedyExploration() {
+    public String epsilonGreedyExploration() {
         BigDecimal right = null, left = null, up = null, down = null;
         Map<String, BigDecimal> actionMap = setActionValues(right, left, up, down);
-        String greatestAction = greedySelection(actionMap);
 
+        String greatestAction = greedySelection(actionMap);
+        double number = generator.nextDouble();
+        if(number < 1-epsilon)
+            return greatestAction;
+        else{
+            List<String> actions = new ArrayList<String>();
+            for(Map.Entry<String, BigDecimal> entry : actionMap.entrySet()){
+                if(entry.getValue().compareTo(actionMap.get(greatestAction)) == 1 || areAllEqual(actionMap)){
+                    actions.add(entry.getKey());
+                }
+            }
+            int randomAction = generator.nextInt((actions.size() - 1) - 0 +1) + 0;
+            return actions.get(randomAction);
+        }
+    }
+
+    private boolean areAllEqual(Map<String, BigDecimal> actionMap) {
+        BigDecimal actionValue = BigDecimal.ZERO;
+        for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
+            if(entry.getValue() != null){
+                actionValue = entry.getValue();
+                break;
+            }
+        }
+        for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
+            if(entry.getValue() != null && actionValue.compareTo(entry.getValue()) != 0){
+                return false;
+            }
+        }
+        return true;
     }
 
     public String greedySelection(Map<String, BigDecimal> actionMap) {
