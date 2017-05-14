@@ -53,9 +53,9 @@ public class GridWorldTest {
   @Test
   public void test_append_reward_values_to_state(){
     gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
-    gridWorld.reloadWorldAfterMovement("down");
-    gridWorld.reloadWorldAfterMovement("down");
-    gridWorld.reloadWorldAfterMovement("rigth");
+    gridWorld.reloadWorldAfterMovementForMonteCarlo("down");
+    gridWorld.reloadWorldAfterMovementForMonteCarlo("down");
+    gridWorld.reloadWorldAfterMovementForMonteCarlo("rigth");
     assertEquals(gridWorld.getqTable()[0][0].getRewards().size(), 3);
     assertEquals(gridWorld.getqTable()[0][1].getRewards().size(), 2);
     assertEquals(gridWorld.getqTable()[0][2].getRewards().size(), 1);

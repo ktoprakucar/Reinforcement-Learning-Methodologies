@@ -50,7 +50,7 @@ public class GridWorld {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    public void reloadWorldAfterMovement(String direction) {
+    public void reloadWorldAfterMovementForMonteCarlo(String direction) {
         int previousX = actor.getxAxis();
         int previousY = actor.getyAxis();
         actor.moveComponent(direction);

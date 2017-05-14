@@ -2,6 +2,7 @@ package simulation;
 
 import entity.Component;
 import environment.GridWorld;
+import learningType.MonteCarlo;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,7 +22,6 @@ public class Main {
     static BufferedImage actorImage;
     static BufferedImage goalImage;
     static Long rewardValue;
-    static int stepNumber;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         rewardValue = 100L;
@@ -32,27 +32,10 @@ public class Main {
         gridWorld = new GridWorld(actor, goal, SIZE, rewardValue, epsilon);
         if(hasWind)
             gridWorld.generateWind();
-        for (int i = 0; i < 1000; i++) {
-           // printQTable();
-            boolean isGoal = false;
-            actor.setxAxis(0);
-            actor.setyAxis(0);
-            while (!isGoal) {
-                String direction = gridWorld.epsilonGreedyExploration();
-                gridWorld.reloadWorldAfterMovement(direction);
-                stepNumber++;
-                Thread.sleep(5);
-                if (actor.getxAxis() == goal.getxAxis() && actor.getyAxis() == goal.getyAxis()) {
-                    System.out.println(stepNumber);
-                    gridWorld.recalculateReturnValues();
-                    isGoal = true;
-                    gridWorld.decreaseEpsilon(0.001);
-                    continue;
-                }
-            }
-            stepNumber = 0;
-        }
+        MonteCarlo.simulateMonteCarlo(actor, goal, gridWorld);
     }
+
+
 
     private static void printQTable() {
         for (int j = 0; j < SIZE; j++) {
