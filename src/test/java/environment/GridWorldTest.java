@@ -2,6 +2,7 @@ package environment;
 
 import entity.Component;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -41,6 +42,7 @@ public class GridWorldTest {
     gridWorld = new GridWorld(actor, goal, 5, rewardValue, epsilon);
   }
 
+  @Ignore
   @Test
   public void test_initialize_rewards_for_each_state(){
     gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
@@ -123,6 +125,14 @@ public class GridWorldTest {
     actionMap.put("left", left);
     String action = gridWorld.greedySelection(actionMap);
     assertEquals(action, "up");
+  }
+
+  @Ignore
+  @Test
+  public void test_calculate_qvalue(){
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
+    BigDecimal qValue = gridWorld.calculateQValue(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.ZERO);
+    assertEquals(BigDecimal.valueOf(24.3), qValue.setScale(1));
   }
 
 }

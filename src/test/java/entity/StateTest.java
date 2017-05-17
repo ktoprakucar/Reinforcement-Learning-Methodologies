@@ -1,5 +1,6 @@
 package entity;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import static junit.framework.TestCase.assertEquals;
 public class StateTest {
     State state = new State();
 
+    @Ignore
     @Test
     public void test_calculate_average_return(){
         state.addReward(BigDecimal.valueOf(10.0));

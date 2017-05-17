@@ -16,7 +16,9 @@ public class GridWorld {
     private int size;
     private State qTable[][];
     private boolean hasWind = false;
-    public static final double gamma = 0.7;
+    public static final double gamma = 0;
+    public static final double alpha = 0.9;
+
     private double epsilon;
     JFrame frame;
     JPanel panel;
@@ -63,6 +65,34 @@ public class GridWorld {
         panel.updateUI();
     }
 
+    public void reloadWorldAfterMovementForQLearning(String direction) {
+        int previousX = actor.getxAxis();
+        int previousY = actor.getyAxis();
+        actor.moveComponent(direction);
+        if (hasWind) {
+            flyActor();
+        }
+        BigDecimal bestNeighbourValue = getGreatestNeighbourValue();
+        BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
+        BigDecimal currentValue = getQValue(previousX, previousY);
+        BigDecimal qValue = calculateQValue(bestNeighbourValue, reward, currentValue);
+        qTable[previousX][previousY].setValue(qValue);
+        panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
+        panel.updateUI();
+
+    }
+
+    public BigDecimal calculateQValue( BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
+        return currentValue.add(BigDecimal.valueOf(alpha).multiply(reward.add(BigDecimal.valueOf(gamma).multiply(bestNeighbourValue).subtract(currentValue))));
+    }
+
+    public BigDecimal getGreatestNeighbourValue(){
+        String directionForBestState = epsilonGreedyExploration(0.0);
+        Component fakeActor = new Component(actor.getxAxis(), actor.getyAxis(),null, null);
+        fakeActor.moveComponent(directionForBestState);
+        return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
+    }
+
     private void flyActor() {
         int xValue = generator.nextInt(((size - 1) - 0) + 1) + 0;
         int yValue = generator.nextInt(((size - 1) - 0) + 1) + 0;
@@ -80,7 +110,7 @@ public class GridWorld {
         }
     }
 
-    public String epsilonGreedyExploration() {
+    public String epsilonGreedyExploration(Double epsilon) {
         Map<String, BigDecimal> actionMap = setActionValues();
         String greatestAction = greedySelection(actionMap);
         double number = generator.nextDouble();
@@ -183,9 +213,9 @@ public class GridWorld {
                 if (i == goal.getxAxis() && j == goal.getyAxis())
                     qTable[i][j].setValue(BigDecimal.valueOf(rewardValue));
                 else if (i == 0 || j == 0 || i == size - 1 || j == size - 1)
-                    qTable[i][j].setValue(BigDecimal.valueOf(-15));
+                    qTable[i][j].setValue(BigDecimal.valueOf(0));
                 else
-                    qTable[i][j].setValue(BigDecimal.valueOf(-5));
+                    qTable[i][j].setValue(BigDecimal.valueOf(0));
 
             }
         }
@@ -197,5 +227,9 @@ public class GridWorld {
                 qTable[i][j].calculateAverageReturn();
             }
         }
+    }
+
+    public double getEpsilon() {
+        return epsilon;
     }
 }

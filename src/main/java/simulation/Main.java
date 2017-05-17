@@ -3,6 +3,7 @@ package simulation;
 import entity.Component;
 import environment.GridWorld;
 import learningType.MonteCarlo;
+import learningType.QLearning;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -32,7 +33,16 @@ public class Main {
         gridWorld = new GridWorld(actor, goal, SIZE, rewardValue, epsilon);
         if(hasWind)
             gridWorld.generateWind();
-        MonteCarlo.simulateMonteCarlo(actor, goal, gridWorld);
+        /*
+        montecarlo:
+        gamma=0.7 edgeReward=-15 movementReward=-5
+         */
+        //MonteCarlo.simulateMonteCarlo(actor, goal, gridWorld);
+        /*
+        qlearning:
+        gamma=0 alpha =0.9 edgeReward=0 movementReward=0
+         */
+        QLearning.simulateQLearning(actor,goal,gridWorld);
     }
 
 
