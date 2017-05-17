@@ -4,6 +4,7 @@ import entity.Component;
 import environment.GridWorld;
 import learningType.MonteCarlo;
 import learningType.QLearning;
+import learningType.Sarsa;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -42,7 +43,8 @@ public class Main {
         qlearning:
         gamma=0 alpha =0.9 edgeReward=0 movementReward=0
          */
-        QLearning.simulateQLearning(actor,goal,gridWorld);
+        //QLearning.simulateQLearning(actor,goal,gridWorld);
+        Sarsa.simulateSarsa(actor,goal,gridWorld);
     }
 
 

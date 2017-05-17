@@ -79,16 +79,39 @@ public class GridWorld {
         qTable[previousX][previousY].setValue(qValue);
         panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
         panel.updateUI();
-
     }
 
-    public BigDecimal calculateQValue( BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
+    public String reloadWorldAfterMovementForSarsa(String direction) {
+        int previousX = actor.getxAxis();
+        int previousY = actor.getyAxis();
+        actor.moveComponent(direction);
+        String nextDirection = epsilonGreedyExploration(epsilon);
+        if (hasWind) {
+            flyActor();
+        }
+        BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
+        BigDecimal currentValue = getQValue(previousX, previousY);
+        BigDecimal nextReward = getNextReward(nextDirection);
+        BigDecimal qValue = calculateQValue(nextReward, reward, currentValue);
+        qTable[previousX][previousY].setValue(qValue);
+        panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
+        panel.updateUI();
+        return nextDirection;
+    }
+
+    private BigDecimal getNextReward(String nextDirection) {
+        Component fakeActor = new Component(actor.getxAxis(), actor.getyAxis(), null, null);
+        fakeActor.moveComponent(nextDirection);
+        return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
+    }
+
+    public BigDecimal calculateQValue(BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
         return currentValue.add(BigDecimal.valueOf(alpha).multiply(reward.add(BigDecimal.valueOf(gamma).multiply(bestNeighbourValue).subtract(currentValue))));
     }
 
-    public BigDecimal getGreatestNeighbourValue(){
+    public BigDecimal getGreatestNeighbourValue() {
         String directionForBestState = epsilonGreedyExploration(0.0);
-        Component fakeActor = new Component(actor.getxAxis(), actor.getyAxis(),null, null);
+        Component fakeActor = new Component(actor.getxAxis(), actor.getyAxis(), null, null);
         fakeActor.moveComponent(directionForBestState);
         return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
     }
@@ -232,4 +255,5 @@ public class GridWorld {
     public double getEpsilon() {
         return epsilon;
     }
+
 }
