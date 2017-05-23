@@ -135,4 +135,11 @@ public class GridWorldTest {
     assertEquals(BigDecimal.valueOf(24.3), qValue.setScale(1));
   }
 
+  @Test
+  public void test_calculate_pValue(){
+    gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
+    BigDecimal pValue = gridWorld.calculatePValue(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.ZERO);
+    assertEquals(pValue, BigDecimal.valueOf(20.0));
+  }
+
 }

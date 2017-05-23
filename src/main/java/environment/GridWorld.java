@@ -2,6 +2,7 @@ package environment;
 
 import entity.Component;
 import entity.State;
+import entity.PType;
 
 import javax.swing.*;
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ public class GridWorld {
     private boolean hasWind = false;
     public static final double gamma = 0;
     public static final double alpha = 0.9;
+    public ArrayList<PType> pQueue = new ArrayList<PType>();
 
     private double epsilon;
     JFrame frame;
@@ -65,14 +67,32 @@ public class GridWorld {
         panel.updateUI();
     }
 
-    public void reloadWorldAfterMovementForQLearning(String direction) {
+    public void reloadWorldAfterMovementForPS(String direction) {
         int previousX = actor.getxAxis();
         int previousY = actor.getyAxis();
         actor.moveComponent(direction);
         if (hasWind) {
             flyActor();
         }
-        BigDecimal bestNeighbourValue = getGreatestNeighbourValue();
+        BigDecimal bestNeighbourValue = getGreatestNeighbourValue(actor.getxAxis(), actor.getyAxis());
+        BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
+        BigDecimal currentValue = getQValue(previousX, previousY);
+        BigDecimal pValue = calculatePValue(bestNeighbourValue, reward, currentValue);
+        if (pValue.compareTo(BigDecimal.ZERO) == 1) {
+            pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
+        }
+        qTable[previousX][previousY].setAccessed();
+        panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
+        panel.updateUI();
+    }
+
+
+    public void reloadWorldAfterMovementForQLearning(String direction) {
+        int previousX = actor.getxAxis();
+        int previousY = actor.getyAxis();
+        actor.moveComponent(direction);
+
+        BigDecimal bestNeighbourValue = getGreatestNeighbourValue(actor.getxAxis(), actor.getyAxis());
         BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
         BigDecimal currentValue = getQValue(previousX, previousY);
         BigDecimal qValue = calculateQValue(bestNeighbourValue, reward, currentValue);
@@ -99,19 +119,24 @@ public class GridWorld {
         return nextDirection;
     }
 
+
     private BigDecimal getNextReward(String nextDirection) {
         Component fakeActor = new Component(actor.getxAxis(), actor.getyAxis(), null, null);
         fakeActor.moveComponent(nextDirection);
         return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
     }
 
+    public BigDecimal calculatePValue(BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
+        return reward.add(BigDecimal.valueOf(gamma).multiply(bestNeighbourValue).subtract(currentValue));
+    }
+
     public BigDecimal calculateQValue(BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
         return currentValue.add(BigDecimal.valueOf(alpha).multiply(reward.add(BigDecimal.valueOf(gamma).multiply(bestNeighbourValue).subtract(currentValue))));
     }
 
-    public BigDecimal getGreatestNeighbourValue() {
+    public BigDecimal getGreatestNeighbourValue(int xAxis, int yAxis) {
         String directionForBestState = epsilonGreedyExploration(0.0);
-        Component fakeActor = new Component(actor.getxAxis(), actor.getyAxis(), null, null);
+        Component fakeActor = new Component(xAxis, yAxis, null, null);
         fakeActor.moveComponent(directionForBestState);
         return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
     }

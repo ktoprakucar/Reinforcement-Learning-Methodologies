@@ -3,6 +3,7 @@ package simulation;
 import entity.Component;
 import environment.GridWorld;
 import learningType.MonteCarlo;
+import learningType.PrioritizedSweeping;
 import learningType.QLearning;
 import learningType.Sarsa;
 
@@ -45,6 +46,7 @@ public class Main {
          */
         //QLearning.simulateQLearning(actor,goal,gridWorld);
         Sarsa.simulateSarsa(actor,goal,gridWorld);
+        //PrioritizedSweeping.simulatePS(actor, goal,gridWorld);
     }
 
 
