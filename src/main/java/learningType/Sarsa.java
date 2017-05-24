@@ -13,7 +13,7 @@ public class Sarsa {
             boolean isGoal = false;
             actor.setxAxis(0);
             actor.setyAxis(0);
-            String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon());
+            String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon(), actor);
             while (!isGoal) {
                 direction = gridWorld.reloadWorldAfterMovementForSarsa(direction);
                 stepNumber++;

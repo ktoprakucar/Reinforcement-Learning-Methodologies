@@ -14,7 +14,7 @@ public class MonteCarlo {
             actor.setxAxis(0);
             actor.setyAxis(0);
             while (!isGoal) {
-                String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon());
+                String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon(), actor);
                 gridWorld.reloadWorldAfterMovementForMonteCarlo(direction);
                 stepNumber++;
                 Thread.sleep(5);

@@ -7,6 +7,7 @@ import entity.PType;
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by toprak on 07-Apr-17.
@@ -19,7 +20,7 @@ public class GridWorld {
     private boolean hasWind = false;
     public static final double gamma = 0;
     public static final double alpha = 0.9;
-    public ArrayList<PType> pQueue = new ArrayList<PType>();
+    public CopyOnWriteArrayList<PType> pQueue = new CopyOnWriteArrayList<PType>();
 
     private double epsilon;
     JFrame frame;
@@ -80,29 +81,11 @@ public class GridWorld {
         BigDecimal pValue = calculatePValue(bestNeighbourValue, reward, currentValue);
         if (pValue.compareTo(BigDecimal.ZERO) == 1) {
             checkPQueueThenAdd(previousX, previousY, pValue);
-
         }
         qTable[previousX][previousY].setAccessed();
         panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
         panel.updateUI();
     }
-
-    public void checkPQueueThenAdd(int previousX, int previousY, BigDecimal pValue) throws InterruptedException {
-        boolean isFound = false;
-        for (PType p : pQueue) {
-            if (p.getPrevXAxis() == previousX && p.getPrevYAxis() == previousY) {
-                if (pValue.compareTo(p.getpValue()) > 0) {
-                    isFound = true;
-                    pQueue.remove(p);
-                    pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
-                    break;
-                }
-            }
-        }
-        if(!isFound)
-            pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
-    }
-
 
     public void reloadWorldAfterMovementForQLearning(String direction) {
         int previousX = actor.getxAxis();
@@ -122,7 +105,7 @@ public class GridWorld {
         int previousX = actor.getxAxis();
         int previousY = actor.getyAxis();
         actor.moveComponent(direction);
-        String nextDirection = epsilonGreedyExploration(epsilon);
+        String nextDirection = epsilonGreedyExploration(epsilon, actor);
         if (hasWind) {
             flyActor();
         }
@@ -136,6 +119,21 @@ public class GridWorld {
         return nextDirection;
     }
 
+    public void checkPQueueThenAdd(int previousX, int previousY, BigDecimal pValue) throws InterruptedException {
+        boolean isFound = false;
+        for (PType p : pQueue) {
+            if (p.getPrevXAxis() == previousX && p.getPrevYAxis() == previousY) {
+                isFound = true;
+                if (pValue.compareTo(p.getpValue()) > 0) {
+                    pQueue.remove(p);
+                    pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
+                    break;
+                }
+            }
+        }
+        if(!isFound)
+            pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
+    }
 
     private BigDecimal getNextReward(String nextDirection) {
         Component fakeActor = new Component(actor.getxAxis(), actor.getyAxis(), null, null);
@@ -152,8 +150,8 @@ public class GridWorld {
     }
 
     public BigDecimal getGreatestNeighbourValue(int xAxis, int yAxis) {
-        String directionForBestState = epsilonGreedyExploration(0.0);
         Component fakeActor = new Component(xAxis, yAxis, null, null);
+        String directionForBestState = epsilonGreedyExploration(0.0,fakeActor);
         fakeActor.moveComponent(directionForBestState);
         return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
     }
@@ -175,8 +173,8 @@ public class GridWorld {
         }
     }
 
-    public String epsilonGreedyExploration(Double epsilon) {
-        Map<String, BigDecimal> actionMap = setActionValues();
+    public String epsilonGreedyExploration(Double epsilon, Component actor) {
+        Map<String, BigDecimal> actionMap = setActionValues(actor);
         String greatestAction = greedySelection(actionMap);
         double number = generator.nextDouble();
         if (number < 1 - epsilon)
@@ -232,7 +230,7 @@ public class GridWorld {
         }
     }
 
-    public Map<String, BigDecimal> setActionValues() {
+    public Map<String, BigDecimal> setActionValues(Component actor) {
         Map<String, BigDecimal> actionMap = new TreeMap<String, BigDecimal>();
         if (actor.getxAxis() - 1 >= 0) {
             actionMap.put("left", qTable[actor.getxAxis() - 1][actor.getyAxis()].getValue());
@@ -258,6 +256,8 @@ public class GridWorld {
     }
 
     public BigDecimal getQValue(int xLocation, int yLocation) {
+        if(xLocation == 4 || yLocation==4)
+            System.out.println("dsadsa");
         return qTable[xLocation][yLocation].getValue();
     }
 
@@ -298,4 +298,7 @@ public class GridWorld {
         return epsilon;
     }
 
+    public int getSize() {
+        return size;
+    }
 }

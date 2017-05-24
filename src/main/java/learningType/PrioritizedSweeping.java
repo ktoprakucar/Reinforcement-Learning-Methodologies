@@ -6,11 +6,15 @@ import environment.GridWorld;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by toprak on 5/23/2017.
  */
 public class PrioritizedSweeping {
+
+    public static final double GAMMA = 0.1;
+
     public static void simulatePS(Component actor, Component goal, GridWorld gridWorld) throws InterruptedException {
         int stepNumber = 0;
         for (int i = 0; i < 1000; i++) {
@@ -18,7 +22,7 @@ public class PrioritizedSweeping {
             actor.setxAxis(0);
             actor.setyAxis(0);
             while (!isGoal) {
-                String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon());
+                String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon(), actor);
                 gridWorld.reloadWorldAfterMovementForPS(direction);
                 planning(gridWorld, 4);
                 stepNumber++;
@@ -34,21 +38,53 @@ public class PrioritizedSweeping {
         }
     }
 
-    private static void planning(GridWorld gridWorld, int stepSize) {
+    private static void planning(GridWorld gridWorld, int stepSize) throws InterruptedException {
         for (int i = 0; i < stepSize; i++) {
+            List<PType> pList = new ArrayList<PType>();
             for (PType p : gridWorld.pQueue) {
                 updateQValue(gridWorld, p);
+                checkNeighboursThenAddPQueue(gridWorld, p);
             }
+            gridWorld.pQueue.addAll(pList);
         }
 
 
+    }
+
+    private static void checkNeighboursThenAddPQueue(GridWorld gridWorld, PType p) throws InterruptedException {
+        List<PType> pList = new ArrayList<PType>();
+        BigDecimal currentValue;
+        if (p.getPrevXAxis() - 1 > 0 && gridWorld.getqTable()[p.getPrevXAxis() - 1][p.getPrevYAxis()].isAccessed()) {
+            currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            if (currentValue.compareTo(BigDecimal.ZERO) > 0)
+                gridWorld.checkPQueueThenAdd(p.getPrevXAxis() - 1, p.getPrevYAxis(),currentValue);
+        }
+        if (p.getPrevXAxis() + 1 < gridWorld.getSize() && gridWorld.getqTable()[p.getPrevXAxis() + 1][p.getPrevYAxis()].isAccessed()) {
+            currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            if (currentValue.compareTo(BigDecimal.ZERO) > 0)
+                gridWorld.checkPQueueThenAdd(p.getPrevXAxis() + 1, p.getPrevYAxis(),currentValue);
+                pList.add(new PType(p.getPrevXAxis() + 1, p.getPrevYAxis(), p.getPrevXAxis(), p.getPrevYAxis(), currentValue));
+        }
+        if (p.getPrevYAxis() + 1 < gridWorld.getSize() && gridWorld.getqTable()[p.getPrevXAxis()][p.getPrevYAxis() + 1].isAccessed()) {
+            currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            if (currentValue.compareTo(BigDecimal.ZERO) > 0)
+                gridWorld.checkPQueueThenAdd(p.getPrevXAxis(), p.getPrevYAxis() + 1,currentValue);
+                pList.add(new PType(p.getPrevXAxis(), p.getPrevYAxis() + 1, p.getPrevXAxis(), p.getPrevYAxis(), currentValue));
+
+        }
+        if (p.getPrevYAxis() - 1 > 0 && gridWorld.getqTable()[p.getPrevXAxis()][p.getPrevYAxis() - 1].isAccessed()) {
+            currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            if (currentValue.compareTo(BigDecimal.ZERO) > 0)
+                gridWorld.checkPQueueThenAdd(p.getPrevXAxis(), p.getPrevYAxis() - 1,currentValue);
+                pList.add(new PType(p.getPrevXAxis(), p.getPrevYAxis() - 1, p.getPrevXAxis(), p.getPrevYAxis(), currentValue));
+        }
     }
 
     private static void updateQValue(GridWorld gridWorld, PType p) {
         BigDecimal reward, currentValue, nextValue, qValue;
         reward = gridWorld.getQValue(p.getxAxis(), p.getyAxis());
         currentValue = gridWorld.getQValue(p.getPrevXAxis(), p.getPrevYAxis());
-        nextValue = gridWorld.getGreatestNeighbourValue(p.getxAxis(), p.getyAxis());
+        nextValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis());
         qValue = gridWorld.calculateQValue(nextValue, reward, currentValue);
         gridWorld.getqTable()[p.getPrevXAxis()][p.getPrevYAxis()].setValue(qValue);
     }

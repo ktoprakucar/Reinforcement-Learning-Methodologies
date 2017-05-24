@@ -152,6 +152,8 @@ public class GridWorldTest {
         assertEquals(2, gridWorld.pQueue.size());
         gridWorld.checkPQueueThenAdd(3, 5, BigDecimal.TEN);
         assertEquals(2, gridWorld.pQueue.size());
+        gridWorld.checkPQueueThenAdd(3, 5, BigDecimal.ONE);
+        assertEquals(2, gridWorld.pQueue.size());
         assertEquals(gridWorld.pQueue.get(1).getpValue(), BigDecimal.TEN);
     }
 

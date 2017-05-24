@@ -45,8 +45,8 @@ public class Main {
         gamma=0 alpha =0.9 edgeReward=0 movementReward=0
          */
         //QLearning.simulateQLearning(actor,goal,gridWorld);
-        Sarsa.simulateSarsa(actor,goal,gridWorld);
-        //PrioritizedSweeping.simulatePS(actor, goal,gridWorld);
+        //Sarsa.simulateSarsa(actor,goal,gridWorld);
+        PrioritizedSweeping.simulatePS(actor, goal,gridWorld);
     }
 
 
