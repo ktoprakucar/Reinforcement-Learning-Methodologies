@@ -67,7 +67,7 @@ public class GridWorld {
         panel.updateUI();
     }
 
-    public void reloadWorldAfterMovementForPS(String direction) {
+    public void reloadWorldAfterMovementForPS(String direction) throws InterruptedException {
         int previousX = actor.getxAxis();
         int previousY = actor.getyAxis();
         actor.moveComponent(direction);
@@ -79,11 +79,28 @@ public class GridWorld {
         BigDecimal currentValue = getQValue(previousX, previousY);
         BigDecimal pValue = calculatePValue(bestNeighbourValue, reward, currentValue);
         if (pValue.compareTo(BigDecimal.ZERO) == 1) {
-            pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
+            checkPQueueThenAdd(previousX, previousY, pValue);
+
         }
         qTable[previousX][previousY].setAccessed();
         panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
         panel.updateUI();
+    }
+
+    public void checkPQueueThenAdd(int previousX, int previousY, BigDecimal pValue) throws InterruptedException {
+        boolean isFound = false;
+        for (PType p : pQueue) {
+            if (p.getPrevXAxis() == previousX && p.getPrevYAxis() == previousY) {
+                if (pValue.compareTo(p.getpValue()) > 0) {
+                    isFound = true;
+                    pQueue.remove(p);
+                    pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
+                    break;
+                }
+            }
+        }
+        if(!isFound)
+            pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
     }
 
 
