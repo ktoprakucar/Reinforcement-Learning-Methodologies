@@ -19,7 +19,7 @@ public class GridWorld {
     private State qTable[][];
     private boolean hasWind = false;
     public static final double gamma = 0;
-    public static final double alpha = 0.9;
+    public static final double alpha = 0.3;
     public CopyOnWriteArrayList<PType> pQueue = new CopyOnWriteArrayList<PType>();
 
     private double epsilon;
@@ -105,10 +105,10 @@ public class GridWorld {
         int previousX = actor.getxAxis();
         int previousY = actor.getyAxis();
         actor.moveComponent(direction);
-        String nextDirection = epsilonGreedyExploration(epsilon, actor);
         if (hasWind) {
             flyActor();
         }
+        String nextDirection = epsilonGreedyExploration(epsilon, actor);
         BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
         BigDecimal currentValue = getQValue(previousX, previousY);
         BigDecimal nextReward = getNextReward(nextDirection);
@@ -131,7 +131,7 @@ public class GridWorld {
                 }
             }
         }
-        if(!isFound)
+        if (!isFound)
             pQueue.add(new PType(previousX, previousY, actor.getxAxis(), actor.getyAxis(), pValue));
     }
 
@@ -151,16 +151,16 @@ public class GridWorld {
 
     public BigDecimal getGreatestNeighbourValue(int xAxis, int yAxis) {
         Component fakeActor = new Component(xAxis, yAxis, null, null);
-        String directionForBestState = epsilonGreedyExploration(0.0,fakeActor);
+        String directionForBestState = epsilonGreedyExploration(0.0, fakeActor);
         fakeActor.moveComponent(directionForBestState);
         return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
     }
 
     private void flyActor() {
-        int xValue = generator.nextInt(((size - 1) - 0) + 1) + 0;
-        int yValue = generator.nextInt(((size - 1) - 0) + 1) + 0;
-        actor.setxAxis(xValue);
-        actor.setyAxis(yValue);
+        if (actor.getxAxis() < size - 1 && actor.getyAxis() < size - 1) {
+            actor.setxAxis(actor.getxAxis() + 1);
+            actor.setyAxis(actor.getyAxis() + 1);
+        }
     }
 
     private void appendRewardToStates(BigDecimal value) {
@@ -256,8 +256,6 @@ public class GridWorld {
     }
 
     public BigDecimal getQValue(int xLocation, int yLocation) {
-        if(xLocation == 4 || yLocation==4)
-            System.out.println("dsadsa");
         return qTable[xLocation][yLocation].getValue();
     }
 

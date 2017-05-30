@@ -27,7 +27,7 @@ public class Main {
     static Long rewardValue;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        rewardValue = 100L;
+        rewardValue = 1L;
         actorImage = ImageIO.read(new File(Main.class.getClassLoader().getResource("cobain.jpg").getFile()));
         goalImage = ImageIO.read(new File(Main.class.getClassLoader().getResource("guitar.png").getFile()));
         actor = new Component(0, 0, actorImage, "actor");
