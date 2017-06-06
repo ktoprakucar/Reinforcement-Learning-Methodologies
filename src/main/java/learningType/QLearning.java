@@ -21,12 +21,12 @@ public class QLearning {
                 String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon(), actor);
                 gridWorld.reloadWorldAfterMovementForQLearning(direction);
                 stepNumber++;
-                Thread.sleep(10);
+                Thread.sleep(1);
                 if (actor.getxAxis() == goal.getxAxis() && actor.getyAxis() == goal.getyAxis()) {
                     System.out.println(counter++ + ": " + stepNumber);
                     isGoal = true;
                     if (gridWorld.getEpsilon() > 0.01)
-                        gridWorld.decreaseEpsilon(0.0001);
+                        gridWorld.decreaseEpsilon(0.001);
                     continue;
                 }
 

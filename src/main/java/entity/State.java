@@ -27,12 +27,20 @@ public class State {
         this.isAccessed = true;
     }
 
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
+
     public BigDecimal getValue() {
         return value;
     }
 
     public void setValue(BigDecimal value) {
         this.value = value;
+    }
+
+    public void setAccessed(boolean accessed) {
+        isAccessed = accessed;
     }
 
     public void addReward(BigDecimal value) {
@@ -45,6 +53,6 @@ public class State {
         for (BigDecimal reward : rewards)
             sum = sum.add(reward);
         if (this.counter != 0)
-            value = value.add(sum.divide(BigDecimal.valueOf(counter), 10, BigDecimal.ROUND_HALF_UP));
+            value = sum.divide(BigDecimal.valueOf(counter), 4);
     }
 }

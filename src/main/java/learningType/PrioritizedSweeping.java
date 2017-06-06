@@ -2,6 +2,7 @@ package learningType;
 
 import entity.Component;
 import entity.PType;
+import entity.State;
 import environment.GridWorld;
 import simulation.Main;
 
@@ -28,7 +29,7 @@ public class PrioritizedSweeping {
                 gridWorld.reloadWorldAfterMovementForPS(direction);
                 planning(gridWorld, 4);
                 stepNumber++;
-                //Thread.sleep(1);
+                Thread.sleep(1);
                 if (actor.getxAxis() == goal.getxAxis() && actor.getyAxis() == goal.getyAxis()) {
                     System.out.println(counter++ + ": " + stepNumber);
                     isGoal = true;
@@ -37,7 +38,17 @@ public class PrioritizedSweeping {
                     continue;
                 }
             }
+            setStatesNonAccessed(gridWorld);
             stepNumber = 0;
+        }
+    }
+
+    private static void setStatesNonAccessed(GridWorld gridWorld) {
+        for (int i = 0; i < gridWorld.getSize(); i++) {
+            for (int j = 0; j < gridWorld.getSize(); j++) {
+                gridWorld.getqTable()[i][j].setAccessed(false);
+
+            }
         }
     }
 
@@ -48,6 +59,7 @@ public class PrioritizedSweeping {
                 updateQValue(gridWorld, p);
                 checkNeighboursThenAddPQueue(gridWorld, p);
             }
+
             gridWorld.pQueue.addAll(pList);
         }
 
@@ -59,17 +71,23 @@ public class PrioritizedSweeping {
         BigDecimal currentValue;
         if (p.getPrevXAxis() - 1 > 0 && gridWorld.getqTable()[p.getPrevXAxis() - 1][p.getPrevYAxis()].isAccessed()) {
             currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            currentValue = currentValue.subtract(gridWorld.getqTable()[p.getPrevXAxis() - 1][p.getPrevYAxis()].getValue());
+            currentValue = currentValue.add(gridWorld.getRValue(p.getPrevXAxis() - 1, p.getPrevYAxis()));
             if (currentValue.compareTo(BigDecimal.ZERO) > 0)
                 gridWorld.checkPQueueThenAdd(p.getPrevXAxis() - 1, p.getPrevYAxis(), currentValue);
         }
         if (p.getPrevXAxis() + 1 < gridWorld.getSize() && gridWorld.getqTable()[p.getPrevXAxis() + 1][p.getPrevYAxis()].isAccessed()) {
             currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            currentValue = currentValue.subtract(gridWorld.getqTable()[p.getPrevXAxis() + 1][p.getPrevYAxis()].getValue());
+            currentValue = currentValue.add(gridWorld.getRValue(p.getPrevXAxis() + 1, p.getPrevYAxis()));
             if (currentValue.compareTo(BigDecimal.ZERO) > 0)
                 gridWorld.checkPQueueThenAdd(p.getPrevXAxis() + 1, p.getPrevYAxis(), currentValue);
             pList.add(new PType(p.getPrevXAxis() + 1, p.getPrevYAxis(), p.getPrevXAxis(), p.getPrevYAxis(), currentValue));
         }
         if (p.getPrevYAxis() + 1 < gridWorld.getSize() && gridWorld.getqTable()[p.getPrevXAxis()][p.getPrevYAxis() + 1].isAccessed()) {
             currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            currentValue = currentValue.subtract(gridWorld.getqTable()[p.getPrevXAxis()][p.getPrevYAxis() + 1].getValue());
+            currentValue = currentValue.add(gridWorld.getRValue(p.getPrevXAxis(), p.getPrevYAxis() + 1));
             if (currentValue.compareTo(BigDecimal.ZERO) > 0)
                 gridWorld.checkPQueueThenAdd(p.getPrevXAxis(), p.getPrevYAxis() + 1, currentValue);
             pList.add(new PType(p.getPrevXAxis(), p.getPrevYAxis() + 1, p.getPrevXAxis(), p.getPrevYAxis(), currentValue));
@@ -77,6 +95,8 @@ public class PrioritizedSweeping {
         }
         if (p.getPrevYAxis() - 1 > 0 && gridWorld.getqTable()[p.getPrevXAxis()][p.getPrevYAxis() - 1].isAccessed()) {
             currentValue = gridWorld.getGreatestNeighbourValue(p.getPrevXAxis(), p.getPrevYAxis()).multiply(BigDecimal.valueOf(GAMMA));
+            currentValue = currentValue.subtract(gridWorld.getqTable()[p.getPrevXAxis()][p.getPrevYAxis() - 1].getValue());
+            currentValue = currentValue.add(gridWorld.getRValue(p.getPrevXAxis(), p.getPrevYAxis() - 1));
             if (currentValue.compareTo(BigDecimal.ZERO) > 0)
                 gridWorld.checkPQueueThenAdd(p.getPrevXAxis(), p.getPrevYAxis() - 1, currentValue);
             pList.add(new PType(p.getPrevXAxis(), p.getPrevYAxis() - 1, p.getPrevXAxis(), p.getPrevYAxis(), currentValue));

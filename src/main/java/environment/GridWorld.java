@@ -143,7 +143,10 @@ public class GridWorld {
     }
 
     public BigDecimal calculatePValue(BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
-        return reward.add(BigDecimal.valueOf(gamma).multiply(bestNeighbourValue).subtract(currentValue));
+        BigDecimal pValue = BigDecimal.valueOf(gamma).multiply(bestNeighbourValue);
+        pValue = reward.add(pValue);
+        pValue = pValue.subtract(currentValue);
+        return pValue;
     }
 
     public BigDecimal calculateQValue(BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
@@ -160,6 +163,13 @@ public class GridWorld {
         String directionForBestState = epsilonGreedyExploration(0.0, fakeActor);
         fakeActor.moveComponent(directionForBestState);
         return getQValue(fakeActor.getxAxis(), fakeActor.getyAxis());
+    }
+
+    public BigDecimal getGreatestNeighbourRewardValue(int xAxis, int yAxis) {
+        Component fakeActor = new Component(xAxis, yAxis, null, null);
+        String directionForBestState = epsilonGreedyExploration(0.0, fakeActor);
+        fakeActor.moveComponent(directionForBestState);
+        return getRValue(fakeActor.getxAxis(), fakeActor.getyAxis());
     }
 
     private void flyActor() {
@@ -182,6 +192,10 @@ public class GridWorld {
     public String epsilonGreedyExploration(Double epsilon, Component actor) {
         Map<String, BigDecimal> actionMap = setActionValues(actor);
         String greatestAction = greedySelection(actionMap);
+        if(greatestAction.charAt(0) == 'x') {
+            greatestAction = greatestAction.replace('x', ' ');
+            return greatestAction.trim();
+        }
         double number = generator.nextDouble();
         if (number < 1 - epsilon)
             return greatestAction;
@@ -217,6 +231,16 @@ public class GridWorld {
         List<String> maxValues = new ArrayList<String>();
         boolean isFirst = true;
         for (Map.Entry<String, BigDecimal> entry : actionMap.entrySet()) {
+
+            if (actor.getxAxis() + 1 == goal.getxAxis() && actor.getyAxis() == goal.getyAxis())
+                return "xrigth";
+            if (actor.getxAxis() - 1 == goal.getxAxis() && actor.getyAxis() == goal.getyAxis())
+                return "xleft";
+            if (actor.getxAxis() == goal.getxAxis() && actor.getyAxis() + 1 == goal.getyAxis())
+                return "xdown";
+            if (actor.getxAxis() == goal.getxAxis() && actor.getyAxis() - 1 == goal.getyAxis())
+                return "xup";
+
             if (isFirst) {
                 maxValues.add(entry.getKey());
                 isFirst = false;
@@ -288,9 +312,9 @@ public class GridWorld {
                 if (i == goal.getxAxis() && j == goal.getyAxis())
                     rewardTable[i][j].setValue(BigDecimal.valueOf(rewardValue));
                 else if (i == 0 || j == 0 || i == size - 1 || j == size - 1)
-                    rewardTable[i][j].setValue(BigDecimal.valueOf(-0.1));
+                    rewardTable[i][j].setValue(BigDecimal.valueOf(0));
                 else
-                    rewardTable[i][j].setValue(BigDecimal.valueOf(-0.1));
+                    rewardTable[i][j].setValue(BigDecimal.valueOf(0));
 
             }
         }
