@@ -139,7 +139,7 @@ public class GridWorldTest {
     public void test_calculate_pValue() {
         gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
         BigDecimal pValue = gridWorld.calculatePValue(BigDecimal.valueOf(10), BigDecimal.valueOf(20), BigDecimal.ZERO);
-        assertEquals(pValue, BigDecimal.valueOf(20.0));
+        assertEquals(pValue, BigDecimal.valueOf(29.50).setScale(2));
     }
 
     @Test
@@ -155,6 +155,16 @@ public class GridWorldTest {
         gridWorld.checkPQueueThenAdd(3, 5, BigDecimal.ONE);
         assertEquals(2, gridWorld.pQueue.size());
         assertEquals(gridWorld.pQueue.get(1).getpValue(), BigDecimal.TEN);
+    }
+
+
+    @Test
+    public void test_q_value(){
+        //alpha 0.3
+        //gamma = 0.95
+        gridWorld = new GridWorld(actor, goal, 6, rewardValue, epsilon);
+        BigDecimal value = gridWorld.calculateQValue(BigDecimal.TEN, BigDecimal.valueOf(5), BigDecimal.ONE);
+        System.out.println(value);
     }
 
 }

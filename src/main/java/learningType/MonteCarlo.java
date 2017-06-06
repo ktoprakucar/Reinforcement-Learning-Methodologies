@@ -7,9 +7,9 @@ import environment.GridWorld;
  * Created by toprak on 5/14/2017.
  */
 public class MonteCarlo {
-    public static void simulateMonteCarlo(Component actor,Component goal, GridWorld gridWorld) throws InterruptedException {
+    public static void simulateMonteCarlo(Component actor, Component goal, GridWorld gridWorld) throws InterruptedException {
         int stepNumber = 0;
-        int counter=0;
+        int counter = 0;
         for (int i = 0; i < 10000; i++) {
             boolean isGoal = false;
             actor.setxAxis(0);
@@ -23,7 +23,8 @@ public class MonteCarlo {
                     System.out.println(counter++ + ": " + stepNumber);
                     gridWorld.recalculateReturnValues();
                     isGoal = true;
-                    gridWorld.decreaseEpsilon(0.001);
+                    if (gridWorld.getEpsilon() > 0.001)
+                        gridWorld.decreaseEpsilon(0.0001);
                     continue;
                 }
             }

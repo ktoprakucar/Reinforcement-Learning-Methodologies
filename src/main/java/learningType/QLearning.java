@@ -2,6 +2,7 @@ package learningType;
 
 import entity.Component;
 import environment.GridWorld;
+import simulation.Main;
 
 import java.math.BigDecimal;
 
@@ -20,11 +21,12 @@ public class QLearning {
                 String direction = gridWorld.epsilonGreedyExploration(gridWorld.getEpsilon(), actor);
                 gridWorld.reloadWorldAfterMovementForQLearning(direction);
                 stepNumber++;
-                Thread.sleep(1);
+                Thread.sleep(10);
                 if (actor.getxAxis() == goal.getxAxis() && actor.getyAxis() == goal.getyAxis()) {
                     System.out.println(counter++ + ": " + stepNumber);
                     isGoal = true;
-                    gridWorld.decreaseEpsilon(0.001);
+                    if (gridWorld.getEpsilon() > 0.01)
+                        gridWorld.decreaseEpsilon(0.0001);
                     continue;
                 }
 

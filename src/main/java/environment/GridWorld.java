@@ -17,8 +17,9 @@ public class GridWorld {
     private Component goal;
     private int size;
     private State qTable[][];
+    public State rewardTable[][];
     private boolean hasWind = false;
-    public static final double gamma = 0;
+    public static final double gamma = 0.95;
     public static final double alpha = 0.3;
     public CopyOnWriteArrayList<PType> pQueue = new CopyOnWriteArrayList<PType>();
 
@@ -63,7 +64,7 @@ public class GridWorld {
             flyActor();
         }
         qTable[previousX][previousY].setAccessed();
-        appendRewardToStates(qTable[actor.getxAxis()][actor.getyAxis()].getValue());
+        appendRewardToStates(rewardTable[actor.getxAxis()][actor.getyAxis()].getValue());
         panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
         panel.updateUI();
     }
@@ -76,15 +77,15 @@ public class GridWorld {
             flyActor();
         }
         BigDecimal bestNeighbourValue = getGreatestNeighbourValue(actor.getxAxis(), actor.getyAxis());
-        BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
+        BigDecimal reward = getRValue(actor.getxAxis(), actor.getyAxis());
         BigDecimal currentValue = getQValue(previousX, previousY);
         BigDecimal pValue = calculatePValue(bestNeighbourValue, reward, currentValue);
         if (pValue.compareTo(BigDecimal.ZERO) == 1) {
             checkPQueueThenAdd(previousX, previousY, pValue);
         }
         qTable[previousX][previousY].setAccessed();
-        panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
-        panel.updateUI();
+        //panel.getComponent(0).setBounds((actor.getxAxis()) * 29, (actor.getyAxis()) * 29, 50, 50);
+        //panel.updateUI();
     }
 
     public void reloadWorldAfterMovementForQLearning(String direction) {
@@ -93,7 +94,7 @@ public class GridWorld {
         actor.moveComponent(direction);
 
         BigDecimal bestNeighbourValue = getGreatestNeighbourValue(actor.getxAxis(), actor.getyAxis());
-        BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
+        BigDecimal reward = getRValue(actor.getxAxis(), actor.getyAxis());
         BigDecimal currentValue = getQValue(previousX, previousY);
         BigDecimal qValue = calculateQValue(bestNeighbourValue, reward, currentValue);
         qTable[previousX][previousY].setValue(qValue);
@@ -109,7 +110,7 @@ public class GridWorld {
             flyActor();
         }
         String nextDirection = epsilonGreedyExploration(epsilon, actor);
-        BigDecimal reward = getQValue(actor.getxAxis(), actor.getyAxis());
+        BigDecimal reward = getRValue(actor.getxAxis(), actor.getyAxis());
         BigDecimal currentValue = getQValue(previousX, previousY);
         BigDecimal nextReward = getNextReward(nextDirection);
         BigDecimal qValue = calculateQValue(nextReward, reward, currentValue);
@@ -146,7 +147,12 @@ public class GridWorld {
     }
 
     public BigDecimal calculateQValue(BigDecimal bestNeighbourValue, BigDecimal reward, BigDecimal currentValue) {
-        return currentValue.add(BigDecimal.valueOf(alpha).multiply(reward.add(BigDecimal.valueOf(gamma).multiply(bestNeighbourValue).subtract(currentValue))));
+        BigDecimal n = BigDecimal.valueOf(gamma).multiply(bestNeighbourValue);
+        BigDecimal a = n.add(reward);
+        a = a.subtract(currentValue);
+        BigDecimal p = BigDecimal.valueOf(alpha).multiply(a);
+        BigDecimal value = currentValue.add(p);
+        return value;
     }
 
     public BigDecimal getGreatestNeighbourValue(int xAxis, int yAxis) {
@@ -259,6 +265,10 @@ public class GridWorld {
         return qTable[xLocation][yLocation].getValue();
     }
 
+    public BigDecimal getRValue(int xLocation, int yLocation) {
+        return rewardTable[xLocation][yLocation].getValue();
+    }
+
     public void decreaseEpsilon(double value) {
         if (epsilon > 0)
             this.epsilon -= value;
@@ -269,16 +279,18 @@ public class GridWorld {
     }
 
     public void initializeRewards(long rewardValue) {
+        rewardTable = new State[size][size];
         qTable = new State[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
+                rewardTable[i][j] = new State();
                 qTable[i][j] = new State();
                 if (i == goal.getxAxis() && j == goal.getyAxis())
-                    qTable[i][j].setValue(BigDecimal.valueOf(rewardValue));
+                    rewardTable[i][j].setValue(BigDecimal.valueOf(rewardValue));
                 else if (i == 0 || j == 0 || i == size - 1 || j == size - 1)
-                    qTable[i][j].setValue(BigDecimal.valueOf(0));
+                    rewardTable[i][j].setValue(BigDecimal.valueOf(-0.1));
                 else
-                    qTable[i][j].setValue(BigDecimal.valueOf(0));
+                    rewardTable[i][j].setValue(BigDecimal.valueOf(-0.1));
 
             }
         }
